@@ -1,0 +1,51 @@
+[gd_scene load_steps=4 format=2]
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends KinematicBody
+
+onready var camera = $Pivot/Camera
+
+var gravity = -30
+var max_speed = 8
+var mouse_sensitivity = 0.002 #radiansperpixel
+
+var velocity = Vector3()
+
+func get_input():
+	var input_dir = Vector3()
+	if Input.is_action_pressed(\"move_forward\"):
+		input_dir += -camera.global_transform.basis.z
+	if Input.is_action_pressed(\"move_back\"):
+		input_dir += -camera.global_transform.basis.z
+	if Input.is_action_pressed(\"strafe_left\"):
+		input_dir += -camera.global_transform.basis.x
+	if Input.is_action_pressed(\"strafe_right\"):
+		input_dir += -camera.global_transform.basis.x
+	input_dir = input_dir.normalized()
+	return input_dir
+func _unhandled_input(event):
+	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		rotate_y(-event.relative.x * mouse_sensitivity)
+		$Pivot.rotate.x(-event.relative.y * mouse_sensitivity)
+"
+
+[sub_resource type="CapsuleShape" id=1]
+radius = 0.5
+
+[sub_resource type="BoxShape" id=2]
+extents = Vector3( 0.4, 0.1, 0.4 )
+
+[node name="FPScharacter" type="KinematicBody"]
+script = SubResource( 3 )
+
+[node name="Body" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0 )
+shape = SubResource( 1 )
+
+[node name="Feet" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0 )
+shape = SubResource( 2 )
+
+[node name="Pivot" type="Spatial" parent="."]
+
+[node name="Camera" type="Camera" parent="Pivot"]
